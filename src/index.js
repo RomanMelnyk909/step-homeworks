@@ -13,38 +13,49 @@ import NotFound from "./Components/UI/NotFound";
 import AddContact from "./Components/AddContact/AddContact";
 import EditContact from "./Components/EditContact/EditContact";
 
+// import API services
+
+import API from "./Components/ApiServices/ApiServices";
+
 class App extends Component {
+  componentDidMount() {
+    API.getContactList().then((list) => {
+      this.setState({ List: list });
+    });
+  }
+
   state = {
     List: [
-      {
-        Id: uuidv4(),
-        Name: "Alexander Verdnam",
-        Phone: "+1-800-600-9898",
-        Email: "example@gmail.com",
-        Gender: "lego",
-        Status: "Friend",
-        Avatar: 4,
-      },
-      {
-        Id: uuidv4(),
-        Name: "Camilla Terry",
-        Phone: "+1-800-456-5890",
-        Email: "camt@gmail.com",
-        Gender: "women",
-        Status: "Private",
-        Avatar: 16,
-      },
-      {
-        Id: uuidv4(),
-        Name: "Evan Piters",
-        Phone: "+1-457-090-2345",
-        Email: "evan@gmail.com",
-        Gender: "men",
-        Status: "Work",
-        Avatar: 33,
-      },
+      // {
+      //   Id: uuidv4(),
+      //   Name: "Alexander Verdnam",
+      //   Phone: "+1-800-600-9898",
+      //   Email: "example@gmail.com",
+      //   Gender: "lego",
+      //   Status: "Friend",
+      //   Avatar: 4,
+      // },
+      // {
+      //   Id: uuidv4(),
+      //   Name: "Camilla Terry",
+      //   Phone: "+1-800-456-5890",
+      //   Email: "camt@gmail.com",
+      //   Gender: "women",
+      //   Status: "Private",
+      //   Avatar: 16,
+      // },
+      // {
+      //   Id: uuidv4(),
+      //   Name: "Evan Piters",
+      //   Phone: "+1-457-090-2345",
+      //   Email: "evan@gmail.com",
+      //   Gender: "men",
+      //   Status: "Work",
+      //   Avatar: 33,
+      // },
     ],
     CurrentContact: "",
+
   };
 
   onStateChange = (Id) => {
@@ -75,23 +86,41 @@ class App extends Component {
     });
   };
 
-  onDelete = (Id) => {
-    const index = this.state.List.findIndex((elem) => elem.Id === Id);
-    let tmpList = this.state.List.slice();
-    const partOne = tmpList.slice(0, index);
-    const partTwo = tmpList.slice(index + 1);
-    tmpList = [...partOne, ...partTwo];
-    this.setState({
-      List: tmpList,
-    });
+  // onDelete = (Id) => {
+  //   const index = this.state.List.findIndex((elem) => elem.Id === Id);
+  //   let tmpList = this.state.List.slice();
+  //   const partOne = tmpList.slice(0, index);
+  //   const partTwo = tmpList.slice(index + 1);
+  //   tmpList = [...partOne, ...partTwo];
+  //   this.setState({
+  //     List: tmpList,
+  //   });
+  //   API.updateDatabase(tmpList);
+  // };
+
+  onDeleteContactHandler = (Id) => {
+    const list = this.state.List.filter((item) => item.Id !== Id);
+
+    API.updateDatabase(list);
+
+    this.setState((prevState) => ({
+      ...prevState,
+      List: prevState.List.filter((item) => item.Id !== Id),
+    }));
   };
 
   onAddNewContact = (newContact) => {
-    let tmpList = this.state.List.slice();
-    tmpList.unshift(newContact);
-    this.setState({
-      List: tmpList,
-    });
+    // let tmpList = this.state.List.slice();
+    // tmpList.unshift(newContact);
+    // this.setState({
+    //   List: tmpList,
+    // });
+    const list = [newContact, ...this.state.List];
+    API.updateDatabase(list);
+    this.setState((prevState) => ({
+      ...prevState,
+      List: [newContact, ...prevState.List],
+    }));
   };
 
   onGetCurrentIndex = (Id) => {
@@ -103,6 +132,15 @@ class App extends Component {
   };
 
   onEditContact = (editedContact) => {
+    const list = this.state.List.map((item) => {
+      if (item.Id === editedContact.Id) {
+        return editedContact;
+      }
+      return item;
+    });
+
+    API.updateDatabase(list);
+
     this.setState((prevState) => ({
       ...prevState,
       List: prevState.List.map((item) => {
@@ -114,8 +152,12 @@ class App extends Component {
     }));
   };
 
+  
+
+  
+
   render() {
-    const { List, CurrentContact } = this.state;
+    const { List, CurrentContact} = this.state;
     return (
       <Fragment>
         <Router>
@@ -127,8 +169,9 @@ class App extends Component {
                 <Main
                   onGetCurrentIndex={this.onGetCurrentIndex}
                   List={List}
-                  onDelete={this.onDelete}
+                  onDelete={this.onDeleteContactHandler}
                   onStateChange={this.onStateChange}
+                  onSearchHandler={this.onSearchHandler}
                 />
               )}
             />
