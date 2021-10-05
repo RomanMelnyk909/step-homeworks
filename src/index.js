@@ -1,7 +1,6 @@
 import ReactDOM from "react-dom";
-import { Fragment, Component } from "react";
+import { Fragment } from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
-import { v4 as uuidv4 } from "uuid";
 
 // Import styles
 import "../node_modules/bootstrap/dist/css/bootstrap.min.css";
@@ -13,191 +12,25 @@ import NotFound from "./Components/UI/NotFound";
 import AddContact from "./Components/AddContact/AddContact";
 import EditContact from "./Components/EditContact/EditContact";
 
-// import API services
+//import store
+import { Provider } from "react-redux";
+import store from "./store";
 
-import API from "./Components/ApiServices/ApiServices";
-
-class App extends Component {
-  componentDidMount() {
-    API.getContactList().then((list) => {
-      this.setState({ List: list });
-    });
-  }
-
-  state = {
-    List: [
-      // {
-      //   Id: uuidv4(),
-      //   Name: "Alexander Verdnam",
-      //   Phone: "+1-800-600-9898",
-      //   Email: "example@gmail.com",
-      //   Gender: "lego",
-      //   Status: "Friend",
-      //   Avatar: 4,
-      // },
-      // {
-      //   Id: uuidv4(),
-      //   Name: "Camilla Terry",
-      //   Phone: "+1-800-456-5890",
-      //   Email: "camt@gmail.com",
-      //   Gender: "women",
-      //   Status: "Private",
-      //   Avatar: 16,
-      // },
-      // {
-      //   Id: uuidv4(),
-      //   Name: "Evan Piters",
-      //   Phone: "+1-457-090-2345",
-      //   Email: "evan@gmail.com",
-      //   Gender: "men",
-      //   Status: "Work",
-      //   Avatar: 33,
-      // },
-    ],
-    CurrentContact: "",
-
-  };
-
-  onStateChange = (Id) => {
-    const index = this.state.List.findIndex((elem) => elem.Id === Id);
-    const contact = this.state.List[index];
-
-    switch (contact.Status) {
-      case "Friend":
-        contact.Status = "Work";
-        break;
-      case "Work":
-        contact.Status = "Family";
-        break;
-      case "Family":
-        contact.Status = "Private";
-        break;
-      case "Private":
-        contact.Status = "Friend";
-        break;
-      default:
-    }
-
-    const tmpList = this.state.List.slice();
-    tmpList[index] = contact;
-
-    this.setState({
-      List: tmpList,
-    });
-  };
-
-  // onDelete = (Id) => {
-  //   const index = this.state.List.findIndex((elem) => elem.Id === Id);
-  //   let tmpList = this.state.List.slice();
-  //   const partOne = tmpList.slice(0, index);
-  //   const partTwo = tmpList.slice(index + 1);
-  //   tmpList = [...partOne, ...partTwo];
-  //   this.setState({
-  //     List: tmpList,
-  //   });
-  //   API.updateDatabase(tmpList);
-  // };
-
-  onDeleteContactHandler = (Id) => {
-    const list = this.state.List.filter((item) => item.Id !== Id);
-
-    API.updateDatabase(list);
-
-    this.setState((prevState) => ({
-      ...prevState,
-      List: prevState.List.filter((item) => item.Id !== Id),
-    }));
-  };
-
-  onAddNewContact = (newContact) => {
-    // let tmpList = this.state.List.slice();
-    // tmpList.unshift(newContact);
-    // this.setState({
-    //   List: tmpList,
-    // });
-    const list = [newContact, ...this.state.List];
-    API.updateDatabase(list);
-    this.setState((prevState) => ({
-      ...prevState,
-      List: [newContact, ...prevState.List],
-    }));
-  };
-
-  onGetCurrentIndex = (Id) => {
-    const index = this.state.List.findIndex((elem) => elem.Id === Id);
-    const currentContact = this.state.List[index];
-    this.setState({
-      CurrentContact: currentContact,
-    });
-  };
-
-  onEditContact = (editedContact) => {
-    const list = this.state.List.map((item) => {
-      if (item.Id === editedContact.Id) {
-        return editedContact;
-      }
-      return item;
-    });
-
-    API.updateDatabase(list);
-
-    this.setState((prevState) => ({
-      ...prevState,
-      List: prevState.List.map((item) => {
-        if (item.Id === editedContact.Id) {
-          return editedContact;
-        }
-        return item;
-      }),
-    }));
-  };
-
-  
-
-  
-
-  render() {
-    const { List, CurrentContact} = this.state;
-    return (
-      <Fragment>
-        <Router>
-          <Switch>
-            <Route
-              path="/"
-              exact
-              render={() => (
-                <Main
-                  onGetCurrentIndex={this.onGetCurrentIndex}
-                  List={List}
-                  onDelete={this.onDeleteContactHandler}
-                  onStateChange={this.onStateChange}
-                  onSearchHandler={this.onSearchHandler}
-                />
-              )}
-            />
-            <Route
-              path="/new-contact"
-              exact
-              render={() => (
-                <AddContact onAddNewContact={this.onAddNewContact} />
-              )}
-            />
-            <Route
-              path="/edit-contact"
-              exact
-              render={() => (
-                <EditContact
-                  onEditContact={this.onEditContact}
-                  CurrentContact={CurrentContact}
-                />
-              )}
-            />
-            <Route component={NotFound} />
-          </Switch>
-        </Router>
-      </Fragment>
-    );
-  }
-}
+const App = () => {
+  return (
+    <Fragment>
+      <Router>
+        <Switch>
+          <Provider store={store}>
+            <Route path="/" exact render={() => <Main />} />
+            <Route path="/new-contact" exact render={() => <AddContact />} />
+            <Route path="/edit-contact" exact render={() => <EditContact />} />
+          </Provider>
+          <Route component={NotFound} />
+        </Switch>
+      </Router>
+    </Fragment>
+  );
+};
 
 ReactDOM.render(<App />, document.getElementById("root"));

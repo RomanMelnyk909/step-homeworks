@@ -2,45 +2,11 @@ import ContactList from "./ContactList/ContactList";
 import SideBar from "../SideBar/SideBar";
 import { Link } from "react-router-dom";
 
-const Main = ({
-  List,
-  onStateChange,
-  onDelete,
-  onGetCurrentIndex,
-  onSearchHandler,
-}) => {
-  let friendCounter = 0;
-  let privateCounter = 0;
-  let workCounter = 0;
-  let familyCounter = 0;
-
-  for (let i = 0; i < List.length; i++) {
-    if (List[i].Status === "Friend") {
-      friendCounter++;
-    } else if (List[i].Status === "Private") {
-      privateCounter++;
-    } else if (List[i].Status === "Work") {
-      workCounter++;
-    } else if (List[i].Status === "Family") {
-      familyCounter++;
-    }
-  }
-  const contactCounter = List.length;
-
-  const onChangeSearchHandler = (event) => {
-    onSearchHandler(event.target.value);
-  };
-
+const Main = () => {
   return (
     <div className="container bootstrap snippets bootdeys bootdey">
       <div className="row decor-default">
-        <SideBar
-          familyCounter={familyCounter}
-          workCounter={workCounter}
-          privateCounter={privateCounter}
-          friendCounter={friendCounter}
-          contactCounter={contactCounter}
-        />
+        <SideBar />
 
         <div className="col-lg-9 col-md-8 col-sm-12">
           <div className="contacts-list">
@@ -54,7 +20,6 @@ const Main = ({
             >
               <div className="input-group">
                 <input
-                  onChange={onChangeSearchHandler}
                   type="text"
                   className="contacts-list-search"
                   placeholder="Search"
@@ -74,12 +39,7 @@ const Main = ({
                 </div>
                 <div className="field phone">Phone</div>
               </div>
-              <ContactList
-                onGetCurrentIndex={onGetCurrentIndex}
-                List={List}
-                onDelete={onDelete}
-                onStateChange={onStateChange}
-              />
+              <ContactList />
             </form>
           </div>
         </div>

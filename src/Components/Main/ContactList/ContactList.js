@@ -1,22 +1,42 @@
-
 import ContactItem from "./ContactItem/ContactItem";
+import { connect } from "react-redux";
+import { useEffect } from "react";
+import API from "../../ApiServices/ApiServices";
 
-const ContactList = ({ List, onStateChange, onDelete, onGetCurrentIndex }) => {
+//import actions
 
-    const contact = List.map(item => {
-        return (<ContactItem key={item.Id} {...item}
-            onStateChange={() => onStateChange(item.Id)}
-            onDelete={() => onDelete(item.Id)}
-            onGetCurrentIndex={() => onGetCurrentIndex(item.Id)} />)
-    })
+import { getAllContacts } from "../../../Actions/ContactListActions";
 
-    return (
+const ContactList = ({ List, getAllContacts }) => {
 
-        <section>
-            {contact.length > 0 ? contact : <p className="emptyList">Contact list is empty!</p>}
-        </section>
+  useEffect(() => {
+    API.getContactList().then(data => {
+      getAllContacts(data);
+    });
+  }, []);
 
-    )
-}
+  const contact = List.map(item => {
+    return <ContactItem key={item.Id} {...item} />;
+  });
 
-export default ContactList;
+  return (
+    <section>
+      {contact.length > 0 ? (
+        contact
+      ) : (
+        <p className="emptyList">Contact list is empty!</p>
+      )}
+    </section>
+  );
+};
+
+const mapStateToProps = ({ ContactListReducer }) => {
+  const { List } = ContactListReducer;
+  return { List };
+};
+
+const mapDispatchToprops = {
+  getAllContacts
+};
+
+export default connect(mapStateToProps, mapDispatchToprops)(ContactList);
