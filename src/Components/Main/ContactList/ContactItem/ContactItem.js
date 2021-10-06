@@ -35,10 +35,6 @@ const ContactItem = ({
     default:
   }
 
-  //   const onDelete = () => {
-  //     deleteContact(List.filter(contact => contact.Id !== Id));
-  //   };
-
   return (
     <div className="unit">
       <div className="field name">

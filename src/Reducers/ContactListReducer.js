@@ -1,6 +1,6 @@
 const initialState = {
   List: [],
-  CurrentContact: ""
+  CurrentContact: "",
 };
 
 const ContactListReducer = (state = initialState, action) => {
@@ -10,10 +10,11 @@ const ContactListReducer = (state = initialState, action) => {
       return { ...state, List: action.payload };
     case "DELETE_CONTACT":
       return { ...state, List: action.payload };
+    case "ADD_CONTACT":
+      return { ...state, List: action.payload };
     default:
       return state;
   }
-  //   return state;
 };
 
 export default ContactListReducer;
