@@ -1,20 +1,27 @@
-export const getAllContacts = contactList => {
+export const UpdateContactList = (ContactList) => {
   return {
-    type: "GET_ALL_CONTACTS",
-    payload: contactList
+    type: "UPDATE_CONTACT_LIST",
+    payload: ContactList,
   };
 };
 
-export const deleteContact = (contactList) => {
-    return {
-        type:"DELETE_CONTACT",
-        payload: contactList
-    }
-}
-
-export const addNewContact = (contact) => {
+export const GetCurrentContact = (currentContact) => {
   return {
-    type: 'ADD_CONTACT',
-    payload: contact
-  }
-}
+    type: "GET_CURRENT_CONTACT",
+    payload: currentContact,
+  };
+};
+
+export const isLoadData = (isLoad) => {
+  return {
+    type: "IS_LOAD_DATA",
+    payload: isLoad,
+  };
+};
+
+export const changeSearch = (searchStr) => {
+  return {
+    type: "search",
+    payload: searchStr,
+  };
+};

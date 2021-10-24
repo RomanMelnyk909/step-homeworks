@@ -1,17 +1,36 @@
 const initialState = {
   List: [],
   CurrentContact: "",
+  dataLoad: false,
+  search: "23",
 };
 
 const ContactListReducer = (state = initialState, action) => {
-  console.log("action payload", action.payload);
+
   switch (action.type) {
-    case "GET_ALL_CONTACTS":
-      return { ...state, List: action.payload };
-    case "DELETE_CONTACT":
-      return { ...state, List: action.payload };
-    case "ADD_CONTACT":
-      return { ...state, List: action.payload };
+    case "UPDATE_CONTACT_LIST":
+      return {
+        ...state,
+        List: action.payload,
+      };
+    case "GET_CURRENT_CONTACT":
+      return {
+        ...state,
+        CurrentContact: action.payload,
+      };
+    case "IS_LOAD_DATA": {
+      return {
+        ...state,
+        dataLoad: action.payload,
+      };
+    }
+    case "search": {
+      console.log("search is run");
+      return {
+        ...state,
+        search: action.payload,
+      };
+    }
     default:
       return state;
   }

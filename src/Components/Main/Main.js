@@ -1,8 +1,11 @@
 import ContactList from "./ContactList/ContactList";
 import SideBar from "../SideBar/SideBar";
 import { Link } from "react-router-dom";
+import { connect } from "react-redux";
+import { changeSearch } from "../../Actions/ContactListActions";
 
-const Main = () => {
+const Main = ({ search }) => {
+  console.log(search);
   return (
     <div className="container bootstrap snippets bootdeys bootdey">
       <div className="row decor-default">
@@ -23,6 +26,9 @@ const Main = () => {
                   type="text"
                   className="contacts-list-search"
                   placeholder="Search"
+                  onChange={(e) => {
+                    changeSearch(e.target.value);
+                  }}
                 />
               </div>
               <div className="unit head">
@@ -48,4 +54,13 @@ const Main = () => {
   );
 };
 
-export default Main;
+const mapStateToProps = ({ ContactListReducer }) => {
+  const { search } = ContactListReducer;
+  return { search };
+};
+
+const mapDispatchToProps = {
+  changeSearch,
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Main);

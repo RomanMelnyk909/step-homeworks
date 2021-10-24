@@ -1,6 +1,7 @@
 import ReactDOM from "react-dom";
-import { Fragment } from "react";
+import { Fragment} from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+
 
 // Import styles
 import "../node_modules/bootstrap/dist/css/bootstrap.min.css";
@@ -8,11 +9,11 @@ import "./index.css";
 
 // Import Components
 import Main from "./Components/Main/Main";
-import NotFound from "./Components/UI/NotFound";
+import NotFound from "./Components/NotFound/NotFound";
 import AddContact from "./Components/AddContact/AddContact";
 import EditContact from "./Components/EditContact/EditContact";
 
-//import store
+// Import Store
 import { Provider } from "react-redux";
 import store from "./store";
 

@@ -1,42 +1,69 @@
+import { useEffect } from "react";
 import ContactItem from "./ContactItem/ContactItem";
 import { connect } from "react-redux";
-import { useEffect } from "react";
-import API from "../../ApiServices/ApiServices";
+import API from "../../../Services/APIService";
+// Import Actions
+import {
+  UpdateContactList,
+  isLoadData,
+  search,
+} from "../../../Actions/ContactListActions";
 
-//import actions
+import loader from "./loader.gif";
 
-import { getAllContacts } from "../../../Actions/ContactListActions";
-
-const ContactList = ({ List, getAllContacts }) => {
-
+const ContactList = ({
+  List,
+  dataLoad,
+  UpdateContactList,
+  isLoadData,
+  search,
+}) => {
   useEffect(() => {
-    API.getContactList().then(data => {
-      getAllContacts(data);
-    });
+    API.GetContactList()
+      .then((data) => {
+        UpdateContactList(data);
+      })
+      .then(() => {
+        isLoadData(true);
+      });
   }, []);
 
-  const contact = List.map(item => {
+  let searchList = List.filter(
+    (contact) => contact.Name.toLowerCase().indexOf(search.toLowerCase()) > -1
+  );
+  
+  const contacts = searchList.map((item) => {
     return <ContactItem key={item.Id} {...item} />;
   });
 
+  
   return (
     <section>
-      {contact.length > 0 ? (
-        contact
+      {!dataLoad && (
+        <div className="loader">
+          <img className="loader-img" src={loader} alt="" />
+        </div>
+      )}
+      {contacts.length > 0 ? (
+        contacts
       ) : (
-        <p className="emptyList">Contact list is empty!</p>
+        <p className="emptyList">
+          <img src="./loader.gif" alt="" />
+          Contact list is empty!
+        </p>
       )}
     </section>
   );
 };
 
 const mapStateToProps = ({ ContactListReducer }) => {
-  const { List } = ContactListReducer;
-  return { List };
+  const { List, dataLoad, search } = ContactListReducer;
+  return { List, dataLoad, search };
 };
 
-const mapDispatchToprops = {
-  getAllContacts
+const mapDispatchToProps = {
+  UpdateContactList,
+  isLoadData,
 };
 
-export default connect(mapStateToProps, mapDispatchToprops)(ContactList);
+export default connect(mapStateToProps, mapDispatchToProps)(ContactList);

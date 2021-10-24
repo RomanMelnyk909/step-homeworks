@@ -1,19 +1,18 @@
 import { Link } from "react-router-dom";
 import { connect } from "react-redux";
-
-import { deleteContact } from "../../../../Actions/ContactListActions";
-import API from '../../../ApiServices/ApiServices'
+import { UpdateContactList, GetCurrentContact } from "../../../../Actions/ContactListActions";
+import API from "../../../../Services/APIService";
 
 const ContactItem = ({
+  Id,
   Name,
   Avatar,
   Phone,
   Email,
   Status,
   Gender,
-  Id,
-  onGetCurrentIndex,
-  deleteContact,
+  UpdateContactList,
+  GetCurrentContact,
   List
 }) => {
   const image = `https://api.randomuser.me/portraits/${Gender}/${Avatar}.jpg`;
@@ -35,6 +34,50 @@ const ContactItem = ({
     default:
   }
 
+  const onStateChange = Id => {
+    const index = List.findIndex(elem => elem.Id === Id);
+    const contact = List[index];
+    switch (contact.Status) {
+      case "Friend":
+        contact.Status = "Work";
+        break;
+      case "Work":
+        contact.Status = "Family";
+        break;
+      case "Family":
+        contact.Status = "Private";
+        break;
+      case "Private":
+        contact.Status = "Friend";
+        break;
+      default:
+    }
+
+    const tmpList = List.slice();
+    tmpList[index] = contact;
+    API.UpdateDatabase(tmpList).then(() => {
+      UpdateContactList(tmpList);
+    })
+  };
+
+  const onDelete = Id => {
+    const index = List.findIndex(elem => elem.Id === Id);
+    let tmpList = List.slice();
+    const partOne = tmpList.slice(0, index);
+    const partTwo = tmpList.slice(index + 1);
+    tmpList = [...partOne, ...partTwo];
+    API.UpdateDatabase(tmpList).then(() => {
+      UpdateContactList(tmpList);
+    })
+  };
+
+  const onEditContact = (Id) => {
+    const index = List.findIndex(elem => elem.Id === Id);
+    let tmpList = List.slice();
+    const currentContact = tmpList[index];
+    GetCurrentContact(currentContact)
+  }
+
   return (
     <div className="unit">
       <div className="field name">
@@ -44,33 +87,30 @@ const ContactItem = ({
           <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"></svg>
         </div>
         <div>
-          <img src={image} alt="i" className="avatar" /> {Name}
+          <img src={image} alt="im" className="avatar" /> {Name}
         </div>
-        <div className={statusColor}>{Status}</div>
+        <div className={statusColor} onClick={() => {onStateChange(Id)}}>{Status}</div>
       </div>
       <div className="field phone">{Phone}</div>
       <div className="field email">{Email}</div>
       <div className="contactIcons">
         <Link to="/edit-contact">
-          <i className="far fa-edit fa-2x" onClick={onGetCurrentIndex}></i>
+          <i className="far fa-edit fa-2x" onClick={() => onEditContact(Id)}></i>
         </Link>
-        <i
-          className="far fa-trash-alt fa-2x"
-          onClick={() => {
-            deleteContact(List.filter(contact => contact.Id !== Id));
-          }}
-        ></i>
+        <i className="far fa-trash-alt fa-2x" onClick={() => onDelete(Id)}></i>
       </div>
     </div>
   );
 };
+
 const mapStateToProps = ({ ContactListReducer }) => {
   const { List } = ContactListReducer;
   return { List };
 };
 
 const mapDispatchToProps = {
-  deleteContact
+  UpdateContactList, GetCurrentContact
 };
+
 
 export default connect(mapStateToProps, mapDispatchToProps)(ContactItem);

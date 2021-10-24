@@ -1,5 +1,12 @@
 import { Component } from "react";
-import { Redirect, Link } from "react-router-dom";
+import { Redirect } from "react-router-dom";
+import { connect } from "react-redux";
+
+// Import actions
+import { GetCurrentContact } from "../../Actions/ContactListActions";
+
+// Import services
+import API from "../../Services/APIService";
 
 // Import styles
 // import "./AddContact.css";
@@ -61,7 +68,7 @@ class EditContact extends Component {
   onEditContact = (e) => {
     e.preventDefault();
     const { Id, Name, Phone, Email, Gender, Status, Avatar } = this.state;
-    const { onEditContact } = this.props;
+    const { GetCurrentContact, List } = this.props;
     const editedContact = {
       Id,
       Name,
@@ -71,16 +78,21 @@ class EditContact extends Component {
       Status,
       Avatar,
     };
-    onEditContact(editedContact);
 
-    this.setState({
-      IsRedirect: true,
+    const index = List.findIndex((elem) => elem.Id === Id);
+    let tmpList = List.slice();
+
+    tmpList[index] = editedContact;
+    API.UpdateDatabase(tmpList).then(() => {
+      GetCurrentContact(editedContact);
+      this.setState({
+        IsRedirect: true,
+      });
     });
   };
 
   render() {
     let { Gender, Avatar, IsRedirect, Name, Phone, Email, Status } = this.state;
-
     let avatarNumber = Avatar;
     if (IsRedirect === true) {
       return <Redirect to="/" />;
@@ -174,9 +186,6 @@ class EditContact extends Component {
               <button type="submit" className="btn btn-primary">
                 Save
               </button>
-              <Link to="/" className="btn btn-primary edit-back">
-                Back
-              </Link>
             </form>
           </div>
           <div className="col-4">
@@ -188,4 +197,13 @@ class EditContact extends Component {
   }
 }
 
-export default EditContact;
+const mapStateToProps = ({ ContactListReducer }) => {
+  const { CurrentContact, List } = ContactListReducer;
+  return { CurrentContact, List };
+};
+
+const mapDispatchToProps = {
+  GetCurrentContact,
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(EditContact);
